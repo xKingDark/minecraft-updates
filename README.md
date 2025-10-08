@@ -19,7 +19,7 @@ This project is open-source under the **MIT License**. Feel free to modify and c
 ## Contributing
 ```shell
 # Fork the repository
-git clone https://github.com/DarkGamerYT/minecraft-updates.git
+git clone https://github.com/xKingDark/minecraft-updates.git
 
 # Create a new branch
 git checkout -b feature-branch
