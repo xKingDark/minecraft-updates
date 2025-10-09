@@ -25,7 +25,7 @@ Platforms.push(new iOS);
 Platforms.push(new Android);
 
 // Platform loop
-async function platformLoop(isPreview: boolean, data: ArticleData) {
+async function platformLoop(isPreview: boolean, data: ArticleData, releaseTime = Date.now()) {
     for (const platform of Platforms) {
         if (isPreview !== platform.fetchPreview
             || data.version.encode() === platform.latestVersion.encode())
@@ -41,12 +41,9 @@ async function platformLoop(isPreview: boolean, data: ArticleData) {
 
     const allDone = Platforms
         .filter((platform) => platform.fetchPreview === isPreview)
-        .every((platform) =>
-            platform.latestVersion.encode() === data.version.encode()
-            && platform.fetchPreview === isPreview
-        );
+        .every((platform) => platform.latestVersion.encode() === data.version.encode());
 
-    const timeSinceRelease = new Date().getTime() - new Date(data.article.updated_at).getTime();
+    const timeSinceRelease = new Date().getTime() - new Date(releaseTime).getTime();
     if (true === allDone || timeSinceRelease > 24 * 60 * 60) {
         Logger.log(LogLevel.Debug, data.version.toString(), "-", "All platforms done!");
         Integrations.emitAllPlatformsDone(isPreview, data);
@@ -54,7 +51,7 @@ async function platformLoop(isPreview: boolean, data: ArticleData) {
     };
 
     await new Promise((resolve) => setTimeout(resolve, 15000)); // Sleep for 15 seconds
-    platformLoop(isPreview, data);
+    platformLoop(isPreview, data, releaseTime);
 };
 
 

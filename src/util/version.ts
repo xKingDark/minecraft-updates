@@ -55,7 +55,7 @@ export default class Version {
             const result = regex.exec(version);
             if (result != void 0) {
                 const [ _, major, minor, patch, revision ] = result.map(Number);
-                return new Version(major, minor, patch || 0, revision < 20 ? 0 : revision, revision >= 20);
+                return new Version(major, minor, patch || 0, revision < 20 ? 0 : (revision || 0), revision >= 20);
             };
         } catch {};
         return new Version(0, 0, 0);

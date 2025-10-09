@@ -6,7 +6,7 @@ export default class iOS extends Platform {
 
     public async fetchLatestVersion(): Promise<Version> {
         try {
-            const response = await fetch("https://itunes.apple.com/lookup?id=479516143");
+            const response = await fetch("https://itunes.apple.com/lookup?id=479516143&country=us", { cache: "no-cache" });
             const { results: [ data ] } = await response.json();
 
             this.latestVersion = Version.fromString(data["version"]);
