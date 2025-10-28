@@ -39,12 +39,12 @@ async function platformLoop(isPreview: boolean, data: ArticleData, releaseTime =
         Integrations.emitPlatformRelease(platform);
     };
 
-    const allDone = Platforms
-        .filter((platform) => platform.fetchPreview === isPreview)
+    const allPlatformsDone = Platforms
+        .filter((platform) => platform.fetchPreview === isPreview) // Relevant Platforms
         .every((platform) => platform.latestVersion.encode() === data.version.encode());
 
     const timeSinceRelease = new Date().getTime() - new Date(releaseTime).getTime();
-    if (true === allDone || timeSinceRelease > 24 * 60 * 60) {
+    if (true === allPlatformsDone || timeSinceRelease > 24 * 60 * 60 * 1000) {
         Logger.log(LogLevel.Debug, data.version.toString(), "-", "All platforms done!");
         Integrations.emitAllPlatformsDone(isPreview, data);
         return;
@@ -82,4 +82,4 @@ function loop() {
 };
 
 setTimeout(loop, 7500);
-setInterval(loop, 60000);
+setInterval(loop, 30000);
