@@ -1,7 +1,8 @@
 import { Platform } from "./common.ts";
 import Version from "../util/version.ts";
-export default class Windows extends Platform {
+export default class WindowsUWP extends Platform {
     public name: string = "Microsoft Store";
+    public override message: string = `This release is out now on the ${this.name}!`;
 
     private readonly PREVIEW_ID = "9P5X4QVLC2XR";
     private readonly RELEASE_ID = "9NBLGGH2JHXJ";

@@ -11,7 +11,7 @@ async function postChangelog(
 ) {
     const emoji = isPreview ? "🍌" : (isHotfix ? "🌶" : "🍋‍🟩");
     const type = isPreview ? "Preview" : (isHotfix ? "Hotfix" : "Stable release");
-    const status = `${emoji} New Minecraft Bedrock Edition ${type}: **${data.version}**\n\n${data.article.url}\n\n#MinecraftBedrockUpdates`;
+    const status = `${emoji} New Minecraft: Bedrock Edition ${type}: **${data.version}**\n\n${data.article.url}\n\n#MinecraftBedrockUpdates`;
 
     const mediaIds: string[] = [];
     if (typeof data.thumbnail === "string") {
@@ -32,13 +32,9 @@ async function postChangelog(
 };
 
 async function platformRelease(masto: Mastodon, status: mastodon.v1.Status, platform: Platform) {
-    const statusText = platform.name === Dedicated.platform
-        ? `Bedrock Dedicated Server for **${platform.fetchPreview ? "Minecraft Preview" : "Minecraft"} v${platform.latestVersion}** is out now!`
-        : `**${platform.fetchPreview ? "Minecraft Preview" : "Minecraft Bedrock"} v${platform.latestVersion}** is out now on the ${platform.name}!`;
-
     await masto.client.v1.statuses.create({
         inReplyToId: status.id,
-        status: statusText
+        status: platform.message
     });
 };
 

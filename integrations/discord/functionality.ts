@@ -28,6 +28,7 @@ import {
     MediaGalleryBuilder,
     MediaGalleryItemBuilder,
 } from "npm:discord.js";
+import TimedPayloadQueue from "./util/timed-payload-queue.ts";
 async function postChangelog(
     discord: Discord,
     isPreview: boolean, isHotfix: boolean,
@@ -128,44 +129,18 @@ async function postChangelog(
     return post;
 };
 
-async function platformRelease(post: ForumThreadChannel, platform: Platform) {
-    const container = new ContainerBuilder();
-    container.addTextDisplayComponents(
-        new TextDisplayBuilder()
-        .setContent(platform.name === Dedicated.platform
-            ? `Bedrock Dedicated Server for **${platform.fetchPreview ? "Minecraft Preview" : "Minecraft"} v${platform.latestVersion}** is out now!`
-            : `**${platform.fetchPreview ? "Minecraft Preview" : "Minecraft"} v${platform.latestVersion}** is out now on the ${platform.name}!`
-        ),
-    );
-                        
-    const row = new ActionRowBuilder<ButtonBuilder>();
-    row.addComponents([
+function platformRelease(post: ForumThreadChannel, platform: Platform) {
+    return [
+        new TextDisplayBuilder().setContent(platform.message),
         new ButtonBuilder()
             .setLabel(platform.name === Dedicated.platform
                 ? "Download Bedrock Dedicated Server"
-                : "Open ".concat(platform.name)
+                : "Open on ".concat(platform.name)
             )
             .setStyle(ButtonStyle.Link)
             .setEmoji({ id: "1090311572024463380", name: "feedback" })
             .setURL(platform.download),
-    ]);
-    
-    try {
-        const message = await post.send({
-            flags: MessageFlags.IsComponentsV2,
-            components: [ container, row ],
-        });
-
-        message.pin()
-            .catch(() => {});
-
-        if (platform.name === "Microsoft Store") {
-            pingMembers(message);
-        };
-    }
-    catch(error) {
-        console.error(error);
-    };
+    ];
 };
 
 export async function newChangelog(
@@ -174,6 +149,7 @@ export async function newChangelog(
     data: ArticleData
 ) {
     const channel = postChangelog(discord, isPreview, isHotfix, data);
+    const payloadQueue = new TimedPayloadQueue(await channel);
 
     // Platform Release
     const platformListener = async (platform: Platform) => {
@@ -187,7 +163,16 @@ export async function newChangelog(
             || data.version.encode() !== platform.latestVersion.encode())
             return;
 
-        await platformRelease(post, platform);
+        payloadQueue.add([
+            ...platformRelease(post, platform),
+            (message: Message) => {
+                if (platform.name !== "Microsoft Store")
+                    return;
+                
+                const type = isPreview ? "Preview" : (isHotfix ? "Hotfix" : "Release");
+                pingMembers(message, `Minecraft ${type} v${data.version.toString()} is now out on the Microsoft Store!\n\n`);
+            },
+        ]);
     };
     discord.on("platformRelease", platformListener);
 
@@ -209,10 +194,10 @@ export async function newChangelog(
     if (message == void 0)
         return post;
 
-    pingMembers(message);
+    pingMembers(message, `New update changelog! Version: ${data.version.toString()}\n\n`);
 };
 
-async function pingMembers(message: Message) {
+async function pingMembers(message: Message, content = "") {
     const pings: string[] = JSON.parse(
         fs.readFileSync("integrations/discord/data/pings.json").toString()
     );
@@ -222,12 +207,18 @@ async function pingMembers(message: Message) {
 
     try {
         const ping = await message.reply({
-            content: pings
+            content: content.concat("-# ",
+                pings
                 .map((id) => `<@${id}>`)
                 .join(" ")
+            ),
+            allowedMentions: {
+                parse: [ "users" ],
+                repliedUser: false,
+            },
         });
 
-        if (await ping.fetch(true) != void 0)
+        if (await ping.fetch(true) !== void 0)
             await ping.delete();
     }
     catch {};

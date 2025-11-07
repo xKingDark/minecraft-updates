@@ -8,14 +8,17 @@
     "scripts": {
         "start": "deno run -A main.ts -A src/index.ts",
         "debug": "deno run --inspect-wait -A src/index.ts --dev",
-        "changelogs": "deno run --allow-all src/data.ts"
+        "changelogs": "deno run --allow-all src/data.ts",
+        "refresh-tokens": "deno run --allow-all src/refresh-tokens.ts"
     },
     "dependencies": {
         "@types/deno": "^2.3.0",
+        "@xboxreplay/xboxlive-auth": "^5.1.0",
         "discord.js": "^14.19.3",
         "dotenv": "^16.5.0",
         "google-play-scraper": "^10.0.1",
         "masto": "^7.1.0",
-        "node-html-parser": "^7.0.1"
+        "node-html-parser": "^7.0.1",
+        "readline-sync": "^1.4.10"
     }
 }

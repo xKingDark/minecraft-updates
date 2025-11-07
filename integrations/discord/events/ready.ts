@@ -4,6 +4,6 @@ export default {
     name: Events.ClientReady,
     once: true,
     execute(client: Client) {
-        Logger.log(LogLevel.Info, "Discord | Logged in as:", client.user?.tag);
+        Logger.log(LogLevel.Info, "Discord — Logged in as:", client.user?.tag);
     },
 };

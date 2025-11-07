@@ -2,11 +2,13 @@
   "version": "5",
   "specifiers": {
     "npm:@types/deno@^2.3.0": "2.3.0",
+    "npm:@xboxreplay/xboxlive-auth@^5.1.0": "5.1.0",
     "npm:discord.js@^14.19.3": "14.21.0",
     "npm:dotenv@^16.5.0": "16.5.0",
     "npm:google-play-scraper@^10.0.1": "10.0.1",
     "npm:masto@^7.1.0": "7.2.0_ws@8.18.3",
-    "npm:node-html-parser@^7.0.1": "7.0.1"
+    "npm:node-html-parser@^7.0.1": "7.0.1",
+    "npm:readline-sync@^1.4.10": "1.4.10"
   },
   "npm": {
     "@discordjs/builders@1.11.3": {
@@ -127,6 +129,9 @@
     },
     "@vladfrangu/async_event_emitter@2.4.6": {
       "integrity": "sha512-RaI5qZo6D2CVS6sTHFKg1v5Ohq/+Bo2LZ5gzUEwZ/WkHhwtGTCB/sVLw8ijOkAUxasZ+WshN/Rzj4ywsABJ5ZA=="
+    },
+    "@xboxreplay/xboxlive-auth@5.1.0": {
+      "integrity": "sha512-UngHHsehZbiTjyyNmo8HvdoUDKMID1U9uVfrpFWUK/2UxPuVTKy5n+CzZQ3S488sW5vOhgh0lHqqynT8ouwgvw=="
     },
     "boolbase@1.0.0": {
       "integrity": "sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww=="
@@ -634,6 +639,9 @@
     "ramda@0.29.1": {
       "integrity": "sha512-OfxIeWzd4xdUNxlWhgFazxsA/nl3mS4/jGZI5n00uWOoSSFRhC1b6gl6xvmzUamgmqELraWp0J/qqVlXYPDPyA=="
     },
+    "readline-sync@1.4.10": {
+      "integrity": "sha512-gNva8/6UAe8QYepIQH/jQ2qn91Qj0B9sYjMBBs3QOB8F2CXcKgLxQaJRP76sWVRQt+QU+8fAkCbCvjjMFu7Ycw=="
+    },
     "requires-port@1.0.0": {
       "integrity": "sha512-KigOCHcocU3XODJxsu8i/j8T9tzT4adHiecwORRQ0ZZFcp7ahwXuRU1m+yuO90C5ZUyGeGfocHDI14M3L3yDAQ=="
     },
@@ -743,11 +751,13 @@
     "packageJson": {
       "dependencies": [
         "npm:@types/deno@^2.3.0",
+        "npm:@xboxreplay/xboxlive-auth@^5.1.0",
         "npm:discord.js@^14.19.3",
         "npm:dotenv@^16.5.0",
         "npm:google-play-scraper@^10.0.1",
         "npm:masto@^7.1.0",
-        "npm:node-html-parser@^7.0.1"
+        "npm:node-html-parser@^7.0.1",
+        "npm:readline-sync@^1.4.10"
       ]
     }
   }

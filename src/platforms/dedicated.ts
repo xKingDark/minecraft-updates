@@ -5,6 +5,7 @@ export default class Dedicated extends Platform {
     public static platform: string = "Dedicated";
     
     public name: string = Dedicated.platform;
+    public override message: string = `Bedrock Dedicated Server for this release is out now!`;
     public override download: string = "https://www.minecraft.net/en-us/download/server/bedrock";
 
     public async fetchLatestVersion(): Promise<Version> {

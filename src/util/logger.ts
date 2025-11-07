@@ -44,7 +44,7 @@ export default class Logger {
         const message =
             "\x1B[0m[".concat(Logger.formatTime(), "] ")
             .concat(Logger.getColor(level))
-            .concat("\x1B[1m[", Logger.getType(level), "] \x1B[0m-");
+            .concat("\x1B[1m[", Logger.getType(level), "]\x1B[0m");
 
         console.log(message, ...data);
     };

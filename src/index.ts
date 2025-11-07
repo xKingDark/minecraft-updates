@@ -14,15 +14,18 @@ import Changelog, { ArticleData } from "./changelog.ts";
 // Platforms
 import { Platform } from "./platforms/common.ts";
 import Dedicated from "./platforms/dedicated.ts";
-import Windows from "./platforms/windows.ts";
+import WindowsUWP from "./platforms/windows-uwp.ts";
+import WindowsGDK from "./platforms/windows-gdk.ts";
+import Xbox from "./platforms/xbox.ts";
 import iOS from "./platforms/ios.ts";
 import Android from "./platforms/android.ts";
 
 export const Platforms: Platform[] = [];
 Platforms.push(new Dedicated, new Dedicated(true));
-Platforms.push(new Windows, new Windows(true));
-Platforms.push(new iOS);
-Platforms.push(new Android);
+Platforms.push(new WindowsUWP, new WindowsUWP(true));
+Platforms.push(new WindowsGDK, new WindowsGDK(true));
+Platforms.push(new Xbox, new Xbox(true));
+Platforms.push(new iOS, new Android); // Mobile Platforms
 
 // Platform loop
 async function platformLoop(isPreview: boolean, data: ArticleData, releaseTime = Date.now()) {
@@ -77,9 +80,19 @@ function loop() {
         Logger.log(LogLevel.Debug, "New release post:", data.article.title);
 
         Changelog.saveArticle(isPreview, data);
-        platformLoop(isPreview, data);
+        setTimeout(() => platformLoop(isPreview, data), 5 * 1000);
     }).catch(console.error);
 };
 
-setTimeout(loop, 7500);
+setTimeout(loop, 7500); // Add some delay before starting. Allows for almost instant fetching as soon as bot starts.
 setInterval(loop, 30000);
+
+
+import XboxApp from "./platforms/xbox-app.ts";
+async function updateTokens() {
+    if (await XboxApp.refreshTokens() !== void 0) {
+        setInterval(XboxApp.refreshTokens, 4 * 60 * 60 * 1000); // Run every 4 hours
+    };
+};
+
+updateTokens();
