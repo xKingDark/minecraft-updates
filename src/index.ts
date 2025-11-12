@@ -1,9 +1,16 @@
-import fs from "node:fs";
-
 import Logger, { LogLevel } from "./util/logger.ts";
 Logger.log(LogLevel.Info, "Starting...");
 
-const { version } = JSON.parse(fs.readFileSync("package.json").toString());
+let version = "0.0.0";
+try {
+    const pkg = JSON.parse(
+        await Deno.readTextFile("package.json")
+    );
+    version = pkg?.version ?? version;
+}
+catch (e) {
+    Logger.log(LogLevel.Warn, "Could not read package.json:", String(e));
+};
 Logger.log(LogLevel.Info, "Version:", version);
 
 // Integrations
@@ -29,32 +36,34 @@ Platforms.push(new iOS, new Android); // Mobile Platforms
 
 // Platform loop
 async function platformLoop(isPreview: boolean, data: ArticleData, releaseTime = Date.now()) {
-    for (const platform of Platforms) {
-        if (isPreview !== platform.fetchPreview
-            || data.version.encode() === platform.latestVersion.encode())
-            continue;
+    const startTime = Number(releaseTime);
+    while (true) {
+        for (const platform of Platforms) {
+            if (isPreview !== platform.fetchPreview
+                || data.version.encode() === platform.latestVersion.encode())
+                continue;
 
-        const version = await platform.fetchLatestVersion();
-        if (data.version.encode() !== version.encode())
-            continue;
+            const version = await platform.fetchLatestVersion();
+            if (data.version.encode() !== version.encode())
+                continue;
 
-        Logger.log(LogLevel.Debug, "New platform release:", platform.name, "- version:", version.toString());
-        Integrations.emitPlatformRelease(platform);
+            Logger.log(LogLevel.Debug, "New platform release:", platform.name, "- version:", version.toString());
+            Integrations.emitPlatformRelease(platform);
+        };
+
+        const allPlatformsDone = Platforms
+            .filter((platform) => platform.fetchPreview === isPreview) // Relevant Platforms
+            .every((platform) => platform.latestVersion.encode() === data.version.encode());
+
+        const timeSinceRelease = Date.now() - startTime;
+        if (true === allPlatformsDone || timeSinceRelease > 24 * 60 * 60 * 1000) {
+            Logger.log(LogLevel.Debug, data.version.toString(), "-", "All platforms done!");
+            Integrations.emitAllPlatformsDone(isPreview, data);
+            return;
+        };
+
+        await new Promise((resolve) => setTimeout(resolve, 15000)); // Sleep for 15 seconds
     };
-
-    const allPlatformsDone = Platforms
-        .filter((platform) => platform.fetchPreview === isPreview) // Relevant Platforms
-        .every((platform) => platform.latestVersion.encode() === data.version.encode());
-
-    const timeSinceRelease = new Date().getTime() - new Date(releaseTime).getTime();
-    if (true === allPlatformsDone || timeSinceRelease > 24 * 60 * 60 * 1000) {
-        Logger.log(LogLevel.Debug, data.version.toString(), "-", "All platforms done!");
-        Integrations.emitAllPlatformsDone(isPreview, data);
-        return;
-    };
-
-    await new Promise((resolve) => setTimeout(resolve, 15000)); // Sleep for 15 seconds
-    platformLoop(isPreview, data, releaseTime);
 };
 
 

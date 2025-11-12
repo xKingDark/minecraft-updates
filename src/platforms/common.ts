@@ -6,6 +6,7 @@ export abstract class Platform {
 
     public fetchPreview: boolean = false;
     public latestVersion: Version = new Version(0, 0, 0);
+    public directLink: string | undefined;
 
     constructor(fetchPreview: boolean = false) {
         this.fetchPreview = fetchPreview;

@@ -55,7 +55,7 @@ export default class Changelog {
         };
 
         const data: ArticleData[] = JSON.parse(
-            fs.readFileSync(articlePath).toString()
+            Deno.readTextFileSync(articlePath)
         );
 
         const article = data.sort(
@@ -81,14 +81,11 @@ export default class Changelog {
         let articles: ArticleData[] = [];
         if (fs.existsSync(article)) {
             articles = JSON.parse(
-                fs.readFileSync(article).toString()
+                Deno.readTextFileSync(article)
             );
         };
 
-        articles.reverse();
-        articles.push(data);
-        articles.reverse();
-
+        articles.unshift(data);
         fs.writeFileSync(article, JSON.stringify(articles, null, 4));
     };
 };

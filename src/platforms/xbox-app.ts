@@ -46,7 +46,8 @@ export default class XboxApp {
         if (!authenticationResponse.ok)
             return;
 
-        const userToken = JSON.parse(await authenticationResponse.text()).Token;
+        const authJson: any = await authenticationResponse.json();
+        const userToken = authJson?.Token;
         const deviceToken = (await xnet.experimental.createDummyWin32DeviceToken()).Token;
 
         const updateBody = {
@@ -71,8 +72,8 @@ export default class XboxApp {
         if (!updateResponse.ok)
             return;
 
-        const updateResponseJSON = JSON.parse(await updateResponse.text());
-        const authorizationHeader = `XBL3.0 x=${updateResponseJSON.DisplayClaims.xui[0].uhs};${updateResponseJSON.Token}`;
+        const updateResponseJSON: any = await updateResponse.json();
+        const authorizationHeader = `XBL3.0 x=${updateResponseJSON?.DisplayClaims?.xui?.[0]?.uhs};${updateResponseJSON?.Token}`;
 
         Deno.env.set("XBOX_HEADER", authorizationHeader);
         return authorizationHeader;
@@ -88,7 +89,7 @@ export default class XboxApp {
         if (!versionsResponse.ok)
             return;
 
-        const versionsResponseJSON = JSON.parse(await versionsResponse.text());
+        const versionsResponseJSON: any = await versionsResponse.json();
         for (const packageFile of versionsResponseJSON.PackageFiles) {
             if (!packageFile.FileName.endsWith(".msixvc") && !packageFile.FileName.endsWith(".xvc"))
                 continue;

@@ -28,6 +28,7 @@ export default class Xbox extends Platform {
             const version = Version.fromString(versions[0] as string);
             let string = version.patch.toString();
 
+            this.directLink = versions[0];
             this.latestVersion = new Version(
                 version.major,
                 version.minor,

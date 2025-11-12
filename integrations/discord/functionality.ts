@@ -7,10 +7,10 @@ import Dedicated from "../../src/platforms/dedicated.ts";
 import Discord from "./index.ts";
 
 const config = JSON.parse(
-    fs.readFileSync(
+    await Deno.readTextFile(
         isDev ? "integrations/discord/data/config-test.json"
         : "integrations/discord/data/config.json"
-    ).toString()
+    )
 );
 
 import {
@@ -74,8 +74,8 @@ async function postChangelog(
         const media = new MediaGalleryBuilder();
         media.addItems(
             new MediaGalleryItemBuilder()
-            .setDescription(data.article.title)
-            .setURL(data.thumbnail),
+                .setDescription(data.article.title)
+                .setURL(data.thumbnail),
         );
         container.addMediaGalleryComponents(media);
     };
@@ -138,8 +138,9 @@ function platformRelease(post: ForumThreadChannel, platform: Platform) {
                 : "Open on ".concat(platform.name)
             )
             .setStyle(ButtonStyle.Link)
-            .setEmoji({ id: "1090311572024463380", name: "feedback" })
+            .setEmoji({ id: "1090311574423609416", name: "changelog" })
             .setURL(platform.download),
+        platform.directLink
     ];
 };
 

@@ -3,8 +3,10 @@ import {
     ButtonBuilder,
     ContainerBuilder,
     MessageFlags,
+
     Channel,
-    ChannelType
+    SectionBuilder,
+    ButtonStyle
 } from "npm:discord.js";
 export default class TimedPayloadQueue {
     private payloads: any[] = [];
@@ -31,13 +33,26 @@ export default class TimedPayloadQueue {
         for (let i = 0; i < this.payloads.length; i++) {
             const payload = this.payloads[i];
 
-            container.addTextDisplayComponents(payload[0]);
+            if (payload[2] !== void 0) {
+                container.addSectionComponents(
+                    new SectionBuilder()
+                        .addTextDisplayComponents(payload[0])
+                        .setButtonAccessory(
+                            new ButtonBuilder()
+                                .setLabel("Link")
+                                .setStyle(ButtonStyle.Link)
+                                .setURL(payload[2])
+                        )
+                );
+            }
+            else container.addTextDisplayComponents(payload[0]);
+
             row.addComponents([ payload[1] ]);
             
             if (i < this.payloads.length - 1)
                 container.addSeparatorComponents((separator) => separator.setDivider(true));
 
-            payloads.push(payload[2]);
+            payloads.push(payload[3]);
         };
 
         this.payloads = [];
