@@ -40,15 +40,18 @@ export default class Version {
     public toString(): string {
         const versions = [ this.major, this.minor, this.patch ];
         if (this.isBeta)
-            return [ ...versions, this.revision ].filter(Boolean).join(".");
+            return [ ...versions, this.revision ].join(".");
 
-        return versions.filter(Boolean).join(".");
+        return versions.join(".");
     };
 
     public toJSON(): string {
         return this.toString();
     };
 
+    /**
+     * @deprecated Use {@link Version.fromUpdatedString} instead.
+     */
     public static fromString(version: string): Version {
         const regex = /(\d+)\.(\d+)(?:\.(\d+))?(?:\.(\d+))?/;
         try {
@@ -56,6 +59,18 @@ export default class Version {
             if (result != void 0) {
                 const [ _, major, minor, patch, revision ] = result.map(Number);
                 return new Version(major, minor, patch || 0, revision < 20 ? 0 : (revision || 0), revision >= 20);
+            };
+        } catch {};
+        return new Version(0, 0, 0);
+    };
+
+    public static fromUpdatedString(version: string): Version {
+        const regex = /(\d+)\.(\d+)(?:\.(\d+))?(?:\.(\d+))?/;
+        try {
+            const result = regex.exec(version);
+            if (result != void 0) {
+                const [ _, year, minor, revision ] = result.map(Number);
+                return new Version(1, year, minor, revision < 20 ? 0 : (revision || 0), revision >= 20);
             };
         } catch {};
         return new Version(0, 0, 0);

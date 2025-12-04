@@ -1,6 +1,6 @@
 {
     "name": "minecraft-updates",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "module": "src/index.js",
     "engines": {
         "deno": ">=2.3"

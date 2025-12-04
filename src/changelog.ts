@@ -28,7 +28,7 @@ export default class Changelog {
         const preview = articles.find((article: any) =>
             article.section_id == 360001185332);
         
-        callback(true, formatArticle(preview));
+        callback(true, formatArticle(preview, true));
 
         // Find latest Stable/Hotfix article
         const stable = articles.find((article: any) =>
@@ -60,14 +60,17 @@ export default class Changelog {
 
         const article = data.sort(
             ({ article: a }, { article: b }) => {
-                const encodedA = Version.fromString(a.title).encode();
-                const encodedB = Version.fromString(b.title).encode();
+                const encodedA = (isPreview
+                    ? Version.fromUpdatedString(a.title) : Version.fromString(a.title)).encode();
+                const encodedB = (isPreview
+                    ? Version.fromUpdatedString(b.title) : Version.fromString(b.title)).encode();
 
                 return encodedB - encodedA;
             },
         )[0];
 
-        return Version.fromString(article?.article?.title);
+        return (isPreview
+            ? Version.fromUpdatedString(article?.article?.title) : Version.fromString(article?.article?.title));
     };
 
     public static saveArticle(isPreview: boolean, data: ArticleData) {
@@ -90,12 +93,12 @@ export default class Changelog {
     };
 };
 
-export function formatArticle(article: any): ArticleData {
+export function formatArticle(article: any, isPreview: boolean = false): ArticleData {
     const parsed = htmlParser.parse(article.body);
     const imageSrc = parsed.getElementsByTagName("img")[0]?.getAttribute("src");
 
     return {
-        version: Version.fromString(article.name),
+        version: isPreview ? Version.fromUpdatedString(article.name) : Version.fromString(article.name),
         thumbnail: (
             imageSrc?.startsWith("https://feedback.minecraft.net/hc/article_attachments/")
             ? imageSrc : null
