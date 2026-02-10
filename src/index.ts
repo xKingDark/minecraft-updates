@@ -89,8 +89,12 @@ function loop() {
         Logger.log(LogLevel.Debug, "New release post:", data.article.title);
 
         Changelog.saveArticle(isPreview, data);
-        setTimeout(() => platformLoop(isPreview, data), 5 * 1000);
-    }).catch(console.error);
+        setTimeout(() => {
+            try {
+                platformLoop(isPreview, data);
+            } catch {};
+        }, 5 * 1000);
+    }).catch((error) => Logger.log(LogLevel.Error, error));
 };
 
 setTimeout(loop, 7500); // Add some delay before starting. Allows for almost instant fetching as soon as bot starts.

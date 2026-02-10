@@ -1,6 +1,8 @@
 import { Platform } from "./common.ts";
 import Version from "../util/version.ts";
 import XboxApp from "./xbox-app.ts";
+import Logger, { LogLevel } from "../util/logger.ts";
+
 export default class WindowsGDK extends Platform {
     public name: string = "Microsoft Store";
     public override message: string = `This release is out now on the ${this.name}!`;
@@ -37,7 +39,9 @@ export default class WindowsGDK extends Platform {
                 this.fetchPreview
             );
         }
-        catch {};
+        catch (error) {
+            Logger.log(LogLevel.Error, "[".concat(this.name, "]"), error);
+        };
         
         return this.latestVersion;
     };

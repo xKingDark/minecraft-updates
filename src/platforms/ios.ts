@@ -1,5 +1,7 @@
 import { Platform } from "./common.ts";
 import Version from "../util/version.ts";
+import Logger, { LogLevel } from "../util/logger.ts";
+
 export default class iOS extends Platform {
     public name: string = "iOS App Store";
     public override message: string = `This release is out now on the ${this.name}!`;
@@ -12,8 +14,8 @@ export default class iOS extends Platform {
 
             this.latestVersion = Version.fromString(data["version"]);
         }
-        catch(e) {
-            console.error(this.name.concat(":"), e);
+        catch(error) {
+            Logger.log(LogLevel.Error, "[".concat(this.name, "]"), error);
         };
         
         return this.latestVersion;

@@ -1,5 +1,7 @@
 import { Platform } from "./common.ts";
 import Version from "../util/version.ts";
+import Logger, { LogLevel } from "../util/logger.ts";
+
 export default class WindowsUWP extends Platform {
     public name: string = "Microsoft Store";
     public override message: string = `This release is out now on the ${this.name}!`;
@@ -47,8 +49,8 @@ export default class WindowsUWP extends Platform {
                 this.fetchPreview
             );
         }
-        catch(e) {
-            console.error(this.name.concat(":"), e);
+        catch(error) {
+            Logger.log(LogLevel.Error, "[".concat(this.name, "]"), error);
         };
         
         return this.latestVersion;

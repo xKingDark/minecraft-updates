@@ -1,6 +1,8 @@
 const isWindows = process.platform === "win32";
 import { Platform } from "./common.ts";
 import Version from "../util/version.ts";
+import Logger, { LogLevel } from "../util/logger.ts";
+
 export default class Dedicated extends Platform {
     public static platform: string = "Dedicated";
     
@@ -16,8 +18,8 @@ export default class Dedicated extends Platform {
             const latest = data[isWindows ? "windows" : "linux"][this.fetchPreview ? "preview" : "stable"];
             this.latestVersion = Version.fromString(latest);
         }
-        catch(e) {
-            console.error(this.name.concat(":"), e);
+        catch(error) {
+            Logger.log(LogLevel.Error, "[".concat(this.name, "]"), error);
         };
         
         return this.latestVersion;
