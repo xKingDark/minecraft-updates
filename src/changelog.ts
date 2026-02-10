@@ -60,17 +60,14 @@ export default class Changelog {
 
         const article = data.sort(
             ({ article: a }, { article: b }) => {
-                const encodedA = (isPreview
-                    ? Version.fromUpdatedString(a.title) : Version.fromString(a.title)).encode();
-                const encodedB = (isPreview
-                    ? Version.fromUpdatedString(b.title) : Version.fromString(b.title)).encode();
+                const encodedA = Version.fromUpdatedString(a.title).encode();
+                const encodedB = Version.fromUpdatedString(b.title).encode();
 
                 return encodedB - encodedA;
             },
         )[0];
 
-        return (isPreview
-            ? Version.fromUpdatedString(article?.article?.title) : Version.fromString(article?.article?.title));
+        return Version.fromUpdatedString(article?.article?.title);
     };
 
     public static saveArticle(isPreview: boolean, data: ArticleData) {
@@ -98,7 +95,7 @@ export function formatArticle(article: any, isPreview: boolean = false): Article
     const imageSrc = parsed.getElementsByTagName("img")[0]?.getAttribute("src");
 
     return {
-        version: isPreview ? Version.fromUpdatedString(article.name) : Version.fromString(article.name),
+        version: Version.fromUpdatedString(article.name),
         thumbnail: (
             imageSrc?.startsWith("https://feedback.minecraft.net/hc/article_attachments/")
             ? imageSrc : null
