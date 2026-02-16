@@ -1,12 +1,22 @@
-import process from "node:process";
 import { Client, GatewayIntentBits } from "npm:discord.js";
 const isDev = process.argv.includes("--dev");
 
 import { Integration } from "../integration.ts";
-import { newChangelog } from "./functionality.ts";
-import registerEvents from "./events.ts";
+import { Events } from "../events.ts";
+
+import { onNewChangelog } from "./functionality.ts";
+import { ArticleData } from "../../src/changelog.ts";
+import registerEvents from "./events/index.ts";
+import Logger, { LogLevel } from "../../src/util/logger.ts";
+
 export default class Discord extends Integration {
-    public client: Client = new Client({
+    static {
+        if (Deno.env.get("DISCORD_INTEGRATION")?.toLowerCase() === "true") {
+            this.register();
+        };
+    };
+
+    public CLIENT: Client = new Client({
         intents: [
             GatewayIntentBits.Guilds,
             GatewayIntentBits.GuildMessageReactions,
@@ -15,21 +25,28 @@ export default class Discord extends Integration {
 
     constructor() {
         super();
+        this.on(Events.NewChangelog, this.onNewChangelog);
 
-        registerEvents(this.client);
+        registerEvents(this.CLIENT);
         this.start();
-
-        this.on("changelog", newChangelog);
     };
 
     public async start() {
         try {
-            await this.client.login(
-                isDev ? process.env["TOKEN-TEST"] : process.env.TOKEN
+            await this.CLIENT.login(
+                isDev
+                    ? Deno.env.get("TOKEN_TEST")
+                    : Deno.env.get("TOKEN")
             );
         }
-        catch {
-            this.start();
+        catch(error) {
+            Logger.log(LogLevel.Error, error);
+            setTimeout(() => this.start(), 5000);
         };
+    };
+
+
+    private onNewChangelog = async(isPreview: boolean, isHotfix: boolean, data: ArticleData) => {
+        onNewChangelog(this, isPreview, isHotfix, data);
     };
 };

@@ -1,8 +1,9 @@
 import { mastodon } from "masto";
+import Mastodon from "./index.ts";
+
 import { ArticleData } from "../../src/changelog.ts";
 import { Platform } from "../../src/platforms/common.ts";
-import Dedicated from "../../src/platforms/dedicated.ts";
-import Mastodon from "./index.ts";
+import { Events } from "../events.ts";
 
 async function postChangelog(
     masto: Mastodon,
@@ -16,7 +17,7 @@ async function postChangelog(
     const mediaIds: string[] = [];
     if (typeof data.thumbnail === "string") {
         const image = await fetch(data.thumbnail);
-        const attachment = await masto.client.v2.media.create({
+        const attachment = await masto.CLIENT.v2.media.create({
             file: await image.blob(),
             description: ""
         });
@@ -24,7 +25,7 @@ async function postChangelog(
         mediaIds.push(attachment.id);
     };
 
-    return masto.client.v1.statuses.create({
+    return masto.CLIENT.v1.statuses.create({
         visibility: "public",
         status,
         mediaIds
@@ -32,13 +33,13 @@ async function postChangelog(
 };
 
 async function platformRelease(masto: Mastodon, status: mastodon.v1.Status, platform: Platform) {
-    await masto.client.v1.statuses.create({
+    await masto.CLIENT.v1.statuses.create({
         inReplyToId: status.id,
         status: platform.message
     });
 };
 
-export async function newChangelog(
+export async function onNewChangelog(
     masto: Mastodon,
     isPreview: boolean, isHotfix: boolean,
     data: ArticleData
@@ -49,7 +50,7 @@ export async function newChangelog(
     const platformListener = async (platform: Platform) => {
         const post = await status;
         if (post == void 0) {
-            masto.off("platformRelease", platformListener);
+            masto.off(Events.NewRelease, platformListener);
             return;
         };
 
@@ -58,17 +59,17 @@ export async function newChangelog(
             return;
 
         platformRelease(masto, post, platform);
-        masto.off("platformRelease", platformListener);
+        masto.off(Events.NewRelease, platformListener);
     };
-    masto.on("platformRelease", platformListener);
+    masto.on(Events.NewRelease, platformListener);
 
     const allDone = (mcPreview: boolean, articleData: ArticleData) => {
         if (isPreview !== mcPreview
             || data.version.encode() !== articleData.version.encode())
             return;
 
-        masto.off("platformRelease", platformListener);
-        masto.off("allPlatformsDone", allDone);
+        masto.off(Events.NewRelease, platformListener);
+        masto.off(Events.AllDone, allDone);
     };
-    masto.on("allPlatformsDone", allDone);
+    masto.on(Events.AllDone, allDone);
 };

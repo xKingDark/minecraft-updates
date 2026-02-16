@@ -1,12 +1,21 @@
-import dotenv from "npm:dotenv";
-dotenv.config();
-
-import console from "node:console";
+import Logger, { LogLevel } from "./src/util/logger.ts";
 if (import.meta.main) {
+    let version = "0.0.0";
+    try {
+        const pkg = JSON.parse(
+            await Deno.readTextFile("deno.json")
+        );
+        version = pkg?.version ?? version;
+    }
+    catch (e) {
+        Logger.log(LogLevel.Warn, "Could not read deno.json:", String(e));
+    };
+    Logger.log(LogLevel.Info, "Version:", version);
+
+
     await main();
 };
 
-import Logger, { LogLevel } from "./src/util/logger.ts";
 async function main() {
     let status: Deno.CommandStatus = {
         code: 1,

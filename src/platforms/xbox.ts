@@ -4,6 +4,11 @@ import XboxApp from "./xbox-app.ts";
 import Logger, { LogLevel } from "../util/logger.ts";
 
 export default class Xbox extends Platform {
+    static {
+        this.register(true);
+        this.register(false);
+    };
+
     public name: string = "Xbox Series S/X";
     public override message: string = `This release is out now on the ${this.name}!`;
 

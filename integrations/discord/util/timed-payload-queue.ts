@@ -11,12 +11,17 @@ import {
 export default class TimedPayloadQueue {
     private payloads: any[] = [];
     private timeoutId: number | null = null;
-    constructor(private channel: Channel | undefined, private delay = 5 * 1000) {};
+
+    constructor(
+        private channel: Channel | undefined,
+        private delay = 5 * 1000
+    ) {};
 
     add(payload: any) {
         this.payloads.push(payload);
-        if (!this.timeoutId)
+        if (!this.timeoutId) {
             this.timeoutId = setTimeout(() => this.flush(), this.delay);
+        };
     };
 
     async flush() {
@@ -34,23 +39,26 @@ export default class TimedPayloadQueue {
             const payload = this.payloads[i];
 
             if (payload[2] !== void 0) {
-                container.addSectionComponents(
-                    new SectionBuilder()
-                        .addTextDisplayComponents(payload[0])
-                        .setButtonAccessory(
-                            new ButtonBuilder()
-                                .setLabel("Link")
-                                .setStyle(ButtonStyle.Link)
-                                .setURL(payload[2])
-                        )
-                );
+                const section = new SectionBuilder()
+                    .addTextDisplayComponents(payload[0])
+                    .setButtonAccessory(
+                        new ButtonBuilder()
+                            .setLabel("Link")
+                            .setStyle(ButtonStyle.Link)
+                            .setURL(payload[2])
+                    );
+
+                container.addSectionComponents(section);
             }
-            else container.addTextDisplayComponents(payload[0]);
+            else {
+                container.addTextDisplayComponents(payload[0]);
+            };
 
             row.addComponents([ payload[1] ]);
             
-            if (i < this.payloads.length - 1)
+            if (i < this.payloads.length - 1) {
                 container.addSeparatorComponents((separator) => separator.setDivider(true));
+            };
 
             payloads.push(payload[3]);
         };
@@ -66,7 +74,10 @@ export default class TimedPayloadQueue {
                 ],
             });
 
-            message.pin().catch(() => {});
+            // Pin the message
+            message
+                .pin()
+                .catch(() => {});
 
             for (let i = 0; i < payloads.length; i++) {
                 payloads[i](message);

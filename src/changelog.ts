@@ -1,20 +1,22 @@
-import fs from "node:fs";
-import path from "node:path";
+import * as path from "jsr:@std/path";
+import * as fs from "jsr:@std/fs";
 
 import htmlParser from "npm:node-html-parser";
 import Version from "./util/version.ts";
 
+interface Article {
+    id: number;
+    url: string;
+    title: string;
+    created_at: string;
+    updated_at: string;
+    edited_at: string;
+};
+
 export interface ArticleData {
     version: Version;
     thumbnail: string | null;
-    article: {
-        id: number;
-        url: string;
-        title: string;
-        created_at: string;
-        updated_at: string;
-        edited_at: string;
-    };
+    article: Article;
 };
 
 export default class Changelog {
@@ -43,9 +45,7 @@ export default class Changelog {
     };
 
     public static getLatestSavedVersion(isPreview: boolean): Version {
-        if (!fs.existsSync("data")) {
-            fs.mkdirSync("data");
-        };
+        fs.ensureDirSync("./data");
 
         const articlePath = path.join("data",
             (isPreview ? "preview-articles" : "stable-articles").concat(".json"));
@@ -71,9 +71,7 @@ export default class Changelog {
     };
 
     public static saveArticle(isPreview: boolean, data: ArticleData) {
-        if (!fs.existsSync("data")) {
-            fs.mkdirSync("data");
-        };
+        fs.ensureDirSync("./data");
 
         const article = path.join("data",
             (isPreview ? "preview-articles" : "stable-articles").concat(".json"));
@@ -86,7 +84,7 @@ export default class Changelog {
         };
 
         articles.unshift(data);
-        fs.writeFileSync(article, JSON.stringify(articles, null, 4));
+        Deno.writeTextFileSync(article, JSON.stringify(articles, null, 4));
     };
 };
 

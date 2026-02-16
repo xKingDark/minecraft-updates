@@ -1,15 +1,8 @@
-import fs from "node:fs";
 const isDev = process.argv.includes("--dev");
-
-import { ArticleData } from "../../src/changelog.ts";
-import { Platform } from "../../src/platforms/common.ts";
-import Dedicated from "../../src/platforms/dedicated.ts";
-import Discord from "./index.ts";
-
 const config = JSON.parse(
     await Deno.readTextFile(
         isDev ? "integrations/discord/data/config-test.json"
-        : "integrations/discord/data/config.json"
+              : "integrations/discord/data/config.json"
     )
 );
 
@@ -28,13 +21,22 @@ import {
     MediaGalleryBuilder,
     MediaGalleryItemBuilder,
 } from "npm:discord.js";
+import Discord from "./index.ts";
+
+import { ArticleData } from "../../src/changelog.ts";
+import { Platform } from "../../src/platforms/common.ts";
+import { Events } from "../events.ts";
+
+import Dedicated from "../../src/platforms/dedicated.ts";
 import TimedPayloadQueue from "./util/timed-payload-queue.ts";
+import Logger, { LogLevel } from "../../src/util/logger.ts";
+
 async function postChangelog(
     discord: Discord,
     isPreview: boolean, isHotfix: boolean,
     data: ArticleData
 ) {
-    const channel = discord.client.channels.cache.get(config.channel);
+    const channel = discord.CLIENT.channels.cache.get(config.channel);
     if (channel == void 0 || channel.type !== ChannelType.GuildForum)
         return;
 
@@ -77,6 +79,7 @@ async function postChangelog(
                 .setDescription(data.article.title)
                 .setURL(data.thumbnail),
         );
+
         container.addMediaGalleryComponents(media);
     };
     
@@ -121,10 +124,12 @@ async function postChangelog(
         return post;
 
     try {
-        await message.react(emoji);
+        await message.react(emoji.replace(/\uFE0F/g, ""));
         await message.pin();
     }
-    catch {};
+    catch(error) {
+        Logger.log(LogLevel.Error, error);
+    };
 
     return post;
 };
@@ -144,7 +149,7 @@ function platformRelease(post: ForumThreadChannel, platform: Platform) {
     ];
 };
 
-export async function newChangelog(
+export async function onNewChangelog(
     discord: Discord,
     isPreview: boolean, isHotfix: boolean,
     data: ArticleData
@@ -156,7 +161,7 @@ export async function newChangelog(
     const platformListener = async (platform: Platform) => {
         const post = await channel;
         if (post == void 0) {
-            discord.off("platformRelease", platformListener);
+            discord.off(Events.NewRelease, platformListener);
             return;
         };
 
@@ -175,17 +180,17 @@ export async function newChangelog(
             },
         ]);
     };
-    discord.on("platformRelease", platformListener);
+    discord.on(Events.NewRelease, platformListener);
 
     const allDone = (mcPreview: boolean, articleData: ArticleData) => {
         if (isPreview !== mcPreview
             || data.version.encode() !== articleData.version.encode())
             return;
 
-        discord.off("platformRelease", platformListener);
-        discord.off("allPlatformsDone", allDone);
+        discord.off(Events.NewRelease, platformListener);
+        discord.off(Events.AllDone, allDone);
     };
-    discord.on("allPlatformsDone", allDone);
+    discord.on(Events.AllDone, allDone);
 
     const post = await channel;
     if (post == void 0)
@@ -200,7 +205,7 @@ export async function newChangelog(
 
 async function pingMembers(message: Message, content = "") {
     const pings: string[] = JSON.parse(
-        fs.readFileSync("integrations/discord/data/pings.json").toString()
+        Deno.readTextFileSync("integrations/discord/data/pings.json")
     );
 
     if (!Array.isArray(pings) || pings.length === 0)
@@ -210,8 +215,8 @@ async function pingMembers(message: Message, content = "") {
         const ping = await message.reply({
             content: content.concat("-# ",
                 pings
-                .map((id) => `<@${id}>`)
-                .join(" ")
+                    .map((id) => `<@${id}>`)
+                    .join(" ")
             ),
             allowedMentions: {
                 parse: [ "users" ],
@@ -219,8 +224,9 @@ async function pingMembers(message: Message, content = "") {
             },
         });
 
-        if (await ping.fetch(true) !== void 0)
+        if (await ping.fetch(true) !== void 0) {
             await ping.delete();
+        };
     }
     catch {};
 };

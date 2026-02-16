@@ -1,5 +1,3 @@
-import console from "node:console";
-
 export enum LogLevel {
     Info = 0,
     Warn,

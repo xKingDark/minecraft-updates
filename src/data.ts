@@ -1,13 +1,11 @@
-import fs from "node:fs";
+import * as path from "jsr:@std/path";
+import * as fs from "jsr:@std/fs";
+fs.ensureDirSync("./data");
 
-if (!fs.existsSync("data")) {
-    fs.mkdirSync("data");
-};
-
-import { ArticleData, formatArticle } from "./changelog.ts";
+import * as Changelog from "./changelog.ts";
 (async () => {
-    const stableArticles: ArticleData[] = [];
-    const previewArticles: ArticleData[] = [];
+    const stableArticles: Changelog.ArticleData[] = [];
+    const previewArticles: Changelog.ArticleData[] = [];
 
     const response = await fetch("https://feedback.minecraft.net/api/v2/help_center/en-us/articles.json?per_page=100");
     const data = await response.json();
@@ -24,17 +22,20 @@ import { ArticleData, formatArticle } from "./changelog.ts";
                 || article.title.includes("Bedrock")
             ));
 
-        stableArticles.push(...stable.map(formatArticle));
+        stableArticles.push(...stable.map((article) => {
+            return Changelog.formatArticle(article, false);
+        }));
 
-        const preview = articles.filter((article: any) =>
-            article.section_id == 360001185332);
-        previewArticles.push(...preview.map(formatArticle));
+        const preview = articles.filter((article: any) => article.section_id == 360001185332);
+        previewArticles.push(...preview.map((article) => {
+            return Changelog.formatArticle(article, true);
+        }));
     };
 
     // Save the articles
-    fs.writeFileSync("data/stable-articles.json",
+    Deno.writeTextFileSync("data/stable-articles.json",
         JSON.stringify(stableArticles, null, 4 ));
 
-	fs.writeFileSync("data/preview-articles.json",
+    Deno.writeTextFileSync("data/preview-articles.json",
         JSON.stringify(previewArticles, null, 4 ));
 })();

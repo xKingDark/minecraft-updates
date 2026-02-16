@@ -4,6 +4,11 @@ import Version from "../util/version.ts";
 import Logger, { LogLevel } from "../util/logger.ts";
 
 export default class Dedicated extends Platform {
+    static {
+        this.register(true);
+        this.register(false);
+    };
+
     public static platform: string = "Dedicated";
     
     public name: string = Dedicated.platform;

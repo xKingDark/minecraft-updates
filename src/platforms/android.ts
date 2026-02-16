@@ -5,6 +5,10 @@ import Version from "../util/version.ts";
 import Logger, { LogLevel } from "../util/logger.ts";
 
 export default class Android extends Platform {
+    static {
+        this.register(false);
+    };
+
     public name: string = "Google Play Store";
     public override message: string = `This release is out now on the ${this.name}!`;
     public override download: string = "https://play.google.com/store/apps/details?id=com.mojang.minecraftpe";

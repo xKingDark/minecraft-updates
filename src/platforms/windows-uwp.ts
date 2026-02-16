@@ -3,6 +3,11 @@ import Version from "../util/version.ts";
 import Logger, { LogLevel } from "../util/logger.ts";
 
 export default class WindowsUWP extends Platform {
+    static {
+        this.register(true);
+        this.register(false);
+    };
+
     public name: string = "Microsoft Store";
     public override message: string = `This release is out now on the ${this.name}!`;
 

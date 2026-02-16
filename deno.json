@@ -1,0 +1,23 @@
+{
+    "name": "minecraft-updates",
+    "version": "1.2.0",
+    "nodeModulesDir": "auto",
+    "tasks": {
+        "start": "deno run --allow-all --env-file main.ts --allow-all src/index.ts",
+        "debug": "deno run --inspect-wait --allow-all --env-file src/index.ts --dev",
+        "changelogs": "deno run --allow-all src/data.ts",
+        "refresh-tokens": "deno run --allow-all src/refresh-tokens.ts"
+    },
+    "exports": {},
+    "imports": {
+        "@std/fs": "jsr:@std/fs@^1.0.22",
+        "@std/path": "jsr:@std/path@^1.1.4",
+        "@types/deno": "npm:@types/deno@^2.5.0",
+        "discord.js": "npm:discord.js@^14.19.3",
+        "masto": "npm:masto@^7.1.0",
+        "@xboxreplay/xboxlive-auth": "npm:@xboxreplay/xboxlive-auth@^5.1.0",
+        "google-play-scraper": "npm:google-play-scraper@^10.0.1",
+        "node-html-parser": "npm:node-html-parser@^7.0.1",
+        "readline-sync": "npm:readline-sync@^1.4.10"
+    }
+}
