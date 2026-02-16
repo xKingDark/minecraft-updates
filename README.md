@@ -7,7 +7,7 @@
 ## Running
 (Ignore this if you're using Docker.)
 1. `deno install` (Installs all the packages)
-2. `deno run changelogs` (Run only the first time. This saves all previous changelogs)
+2. `deno run changelogs` (Run only the first time. This saves all previous changelogs so it may take a bit)
 3. `deno run start`
 
 Make sure you have:

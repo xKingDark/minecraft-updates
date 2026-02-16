@@ -1,5 +1,5 @@
-import { ArticleData } from "../src/changelog.ts";
-import { Platform } from "../src/platforms/common.ts";
+import { ArticleData } from "../changelog.ts";
+import { Platform } from "../platforms/common.ts";
 
 export enum Events {
     NewChangelog = "newChangelog",

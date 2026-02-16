@@ -54,7 +54,9 @@ export default class TimedPayloadQueue {
                 container.addTextDisplayComponents(payload[0]);
             };
 
-            row.addComponents([ payload[1] ]);
+            if (payload[1] !== void 0) {
+                row.addComponents([ payload[1] ]);
+            };
             
             if (i < this.payloads.length - 1) {
                 container.addSeparatorComponents((separator) => separator.setDivider(true));
@@ -67,11 +69,14 @@ export default class TimedPayloadQueue {
         this.timeoutId = null;
 
         try {
+            const components: any[] = [ container ];
+            if (row.components.length > 0) {
+                components.push(row);
+            };
+
             const message = await this.channel.send({
                 flags: MessageFlags.IsComponentsV2,
-                components: [
-                    container, row
-                ],
+                components,
             });
 
             // Pin the message

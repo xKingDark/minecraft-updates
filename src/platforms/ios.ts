@@ -3,6 +3,10 @@ import Version from "../util/version.ts";
 import Logger, { LogLevel } from "../util/logger.ts";
 
 export default class iOS extends Platform {
+    static {
+        this.register(false);
+    };
+    
     public name: string = "iOS App Store";
     public override message: string = `This release is out now on the ${this.name}!`;
     public override download: string = "https://apps.apple.com/app/apple-store/id479516143";

@@ -2,8 +2,8 @@ import Logger, { LogLevel } from "./util/logger.ts";
 Logger.log(LogLevel.Info, "Starting...");
 
 // Integrations
-import { Integration } from "../integrations/integration.ts";
-import { Events } from "../integrations/events.ts";
+import { Integration } from "./integrations/integration.ts";
+import { Events } from "./integrations/events.ts";
 await Integration.createAll("./integrations");
 
 // Platforms
@@ -53,7 +53,7 @@ function loop() {
         if (stable === data.version.encode())
             return;
 
-        const isHotfix = data.version.patch > Math.floor(data.version.patch / 10) * 10;
+        const isHotfix = data.version.minor > Math.floor(data.version.minor / 10) * 10;
 
         Integration.emit(Events.NewChangelog, isPreview, !isPreview && isHotfix, data);
         Logger.log(LogLevel.Debug, "New release post:", data.article.title);

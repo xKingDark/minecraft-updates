@@ -1,12 +1,13 @@
 import { createRestAPIClient, mastodon } from "npm:masto";
 
-import { Integration } from "../integration.ts";
-import { Events } from "../events.ts";
+import { Integration } from "../../src/integrations/integration.ts";
+import { Events } from "../../src/integrations/events.ts";
 
-import { onNewChangelog } from "./functionality.ts";
 import { ArticleData } from "../../src/changelog.ts";
+import { MastodonRelease } from "./services/release-dispatcher.ts";
 
 export default class Mastodon extends Integration {
+    private releaseDispatcher = new MastodonRelease(this);
     static {
         if (Deno.env.get("MASTO_INTEGRATION")?.toLowerCase() === "true") {
             this.register();
@@ -29,6 +30,6 @@ export default class Mastodon extends Integration {
     
     
     private onNewChangelog = async(isPreview: boolean, isHotfix: boolean, data: ArticleData) => {
-        onNewChangelog(this, isPreview, isHotfix, data);
+        this.releaseDispatcher.handle(isPreview, isHotfix, data);
     };
 };

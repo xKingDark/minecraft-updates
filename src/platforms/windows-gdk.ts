@@ -33,15 +33,19 @@ export default class WindowsGDK extends Platform {
                 return this.latestVersion;
 
             const version = Version.fromString(versions[0] as string);
-            let string = version.patch.toString();
+            let string = version.minor.toString();
 
             this.directLink = versions[0];
             this.latestVersion = new Version(
                 version.major,
-                version.minor,
-                Number(string.slice(0, string.length - 2)),
-                this.fetchPreview ? Number(string.slice(string.length - 2, string.length)) : 0,
-                this.fetchPreview
+                Number(
+                    string.slice(0, string.length - 2)
+                ),
+                Number(
+                    string.slice(string.length - 2, string.length)
+                ),
+                version.revision,
+                this.fetchPreview ? "preview" : "stable"
             );
         }
         catch (error) {
