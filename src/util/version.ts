@@ -8,7 +8,7 @@ export default class Version {
         public readonly revision?: number,
         public readonly stage?: string
     ) {
-        if (this.stage !== void 0) {
+        if (this.stage === void 0) {
             this.stage = "stable";
         };
     };
@@ -110,12 +110,13 @@ export default class Version {
             stageRevision = rev ? Number(rev) : undefined;
         };
 
+        const rev = stageRevision ?? revision;
         return new Version(
             major,
             minor,
-            revision ?? stageRevision,
+            rev,
             build,
-            stage ?? (revision >= 20 ? "preview" : "stable")
+            stage ?? ((rev >= 20 || build >= 20) ? "preview" : "stable")
         );
     };
 };
