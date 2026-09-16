@@ -68,7 +68,7 @@ function loop() {
     }).catch((error) => Logger.log(LogLevel.Error, error));
 };
 
-setTimeout(loop, 7500); // Add some delay before starting. Allows for almost instant fetching as soon as bot starts.
+setTimeout(loop, 10500); // Add some delay before starting. Allows for almost instant fetching as soon as bot starts.
 setInterval(loop, 60000);
 
 
@@ -79,4 +79,6 @@ async function updateTokens() {
     };
 };
 
-updateTokens();
+updateTokens().catch((error) => {
+    Logger.log(LogLevel.Error, error);
+});
